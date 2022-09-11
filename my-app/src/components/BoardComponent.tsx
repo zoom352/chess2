@@ -1,5 +1,5 @@
 import {Board} from '../models/Board';
-import React, {FC, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import CellComponent from "./CellComponent";
 import {Cell} from '../models/Cell';
 
@@ -8,17 +8,36 @@ interface BoardProps {
     setBoard: (board: Board) => void;
 }
 
-const BoardComponent: FC<BoardProps> = ({
-    board,
-    setBoard
-}) => {
+const BoardComponent: FC<BoardProps> = (
+    {
+        board,
+        setBoard
+    }) => {
     const [selectedCell, setSelectedCell] = useState<Cell | null>(null)
 
+    useEffect(() => {
+        hightlightCells()
+    }, [selectedCell])
+
     function click(cell: Cell) {
-        if(cell.figure) {
+        if(selectedCell && selectedCell !== cell && selectedCell.figure?.canMove(cell)) { //ячейка не равняется той ячейки на которую мы хотим нажать
+            selectedCell.moveFigure(cell)
+            setSelectedCell(null)
+        } else {
             setSelectedCell(cell)
         }
     }
+
+    function hightlightCells() { // на какие ячейки может перемещаться фигура которая выбранна в данный момент
+        board.hightlightCells(selectedCell)
+        updateBoard()
+    }
+
+    function updateBoard() {
+        const newBoard = board.getCopyBoard()
+        setBoard(newBoard)
+    }
+
     return (
         <div className='board'>
             {board.cells.map((row, index) => {

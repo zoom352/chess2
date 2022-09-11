@@ -28,6 +28,22 @@ export class Board {
         return this.cells[y][x]
     }
 
+    public getCopyBoard() {
+        const newBoard = new Board()
+        newBoard.cells = this.cells
+        return newBoard
+    }
+
+    public hightlightCells(selectedCell: Cell | null) {
+        for(let i = 0; i < this.cells.length; i++){
+            const row = this.cells[i]
+            for(let j = 0; j < row.length; j++) {
+                const target = row[j] // потенциально куда может походить фигура
+                target.available = !!selectedCell?.figure?.canMove(target)
+            }
+        }
+    }
+
     private addBishops(){
         new Bishop(Colors.BLACK, this.getCell(2, 0))
         new Bishop(Colors.WHITE, this.getCell(2, 7))
@@ -49,8 +65,8 @@ export class Board {
 
     private addPawns(){
         for(let i = 0; i < 8; i++){
-            new Bishop(Colors.BLACK, this.getCell(i, 1))
-            new Bishop(Colors.WHITE, this.getCell(i, 6))
+            new Pawn(Colors.BLACK, this.getCell(i, 1))
+            new Pawn(Colors.WHITE, this.getCell(i, 6))
         }
     }
 
